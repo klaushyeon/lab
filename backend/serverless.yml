@@ -1,0 +1,40 @@
+service: backend
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: '3012'
+    noPrependStageInUrl: true
+
+functions:
+  hello:
+    handler: handler.hello
+  post:
+    handler: src/post/handler.post
+    events:
+      - http:
+          path: post
+          method: post
+          cors: true
+  addPost:
+    handler: src/addPost/handler.addPost
+    events:
+      - http:
+          path: addPost
+          method: post
+          cors: true
+  delPost:
+    handler: src/delPost/handler.delPost
+    events:
+      - http:
+          path: delPost
+          method: post
+          cors: true

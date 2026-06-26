@@ -1,0 +1,14 @@
+[
+  {
+    "id": "6a37c3678bc6f0d4405a43ee",
+    "title": "Building a Responsive Dashboard with TypeScript and MUI",
+    "content": "Learn how TypeScript improves component reliability by catching errors during compile time, while MUI provides a polished UI with responsive layout and accessible elements.",
+    "date": "2026-06-21"
+  },
+  {
+    "id": "6a37c36253e30e91f574c83e",
+    "title": "Understanding State vs Props in React",
+    "content": "State stores component-specific values that can change over time, while props are read-only values passed from parent to child to configure rendering and behavior.",
+    "date": "2026-06-21"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "backend",
+    },
+    {
+      "path": "fornt",
+    },
+    {
+      "name": "lab",
+      "path": ".",
+    },
+  ],
+  "settings": {},
+}
