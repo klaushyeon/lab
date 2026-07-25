@@ -25,6 +25,10 @@ const Board: FC = () => {
 	const [title, setTitle] = useState<string>('')
 	const [content, setContent] = useState<string>('')
 	const [viewingPost, setViewingPost] = useState<Post | null>(null)
+	const [searchInput, setSearchInput] = useState<string>('')
+	const [resetInput, setResetInput] = useState<string>("")
+	const [editMode, setEditMode] = useState<boolean>(false)
+
 
 	const loadPosts = useCallback(async () => {
 		try {
@@ -65,12 +69,45 @@ const Board: FC = () => {
 			await axios.post<Post>('http://localhost:3012/delPost', {
 				id,
 			})
-			loadPosts()
+			handleSearch(searchInput)
 			if (viewingPost && viewingPost.id === id) {
 				setViewingPost(null)
 			}
 		}
 	}
+
+	const handleSearch = async (searchInput: string) => {
+		if (!searchInput) {
+			alert('Please write search keywords.')
+			return
+		}
+		const response = await axios.post('http://localhost:3012/searchPost', {
+			searchInput
+		})
+		setPosts(response.data)
+	}
+
+	const handleReset = async () => {
+		setSearchInput("")
+		loadPosts()
+	}
+
+	const handleUpdate = async () => {
+		if ((!viewingPost || !viewingPost.content || !viewingPost.title)) {
+			alert('Please enter both a title and content.')
+			return
+		}
+
+		await axios.post<Post>('http://localhost:3012/editPost', {
+			id: viewingPost.id,
+			title: viewingPost.title,
+			content: viewingPost.content,
+		})
+		setEditMode(false)
+		loadPosts()
+	}
+
+
 
 	return (
 		<Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
@@ -120,7 +157,24 @@ const Board: FC = () => {
 					</Button>
 				</Box>
 			</Paper>
-
+			<Paper elevation={2} sx={{ p: 3, mb: 4, backgroundColor: '#ffffff' }}>
+				<Typography variant="h6" gutterBottom>
+					Search Posts
+				</Typography>
+				<Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'center' }}>
+					<TextField label="Search" variant="outlined" fullWidth value={searchInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)} />
+					<Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+						<Button variant="contained" color="primary"
+							onClick={() =>
+								handleSearch(searchInput)}>
+							Search
+						</Button>
+						<Button variant="contained" color="secondary" onClick={handleReset}>
+							Reset
+						</Button>
+					</Box>
+				</Box>
+			</Paper>
 			<Divider sx={{ my: 3 }} />
 
 			<Box
@@ -195,7 +249,65 @@ const Board: FC = () => {
 					<Typography variant="h6" gutterBottom>
 						Post Details
 					</Typography>
-					{viewingPost ? (
+					{viewingPost ? (editMode ? (
+						<Paper
+							elevation={2}
+							sx={{
+								p: 3,
+								minHeight: '200px',
+								display: 'flex',
+								flexDirection: 'column',
+								justifyContent: 'space-between',
+							}}
+						>
+							<Box>
+								<TextField
+									fullWidth
+									variant="outlined"
+									type="text"
+									value={viewingPost.title}
+									onChange={(e) => setViewingPost({ ...viewingPost, title: e.target.value })}
+								/>
+								<Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 2 }}>
+									Posted on: {viewingPost.date}
+								</Typography>
+								<TextField
+									fullWidth
+									multiline
+									rows={4}
+									variant="outlined"
+									type="text"
+									value={viewingPost.content}
+									onChange={(e) => setViewingPost({ ...viewingPost, content: e.target.value })}
+								/>
+							</Box>
+							<Box>
+								<Button
+									variant="outlined"
+									color="inherit"
+									size="small"
+									onClick={() => 
+										handleUpdate()
+									}
+
+									sx={{ mt: 3, alignSelf: 'flex-start' }}
+								>
+									Submit
+
+								</Button>
+								<Button
+									variant="outlined"
+									color="inherit"
+									size="small"
+									onClick={() => setViewingPost(null)}
+									sx={{ mt: 3, alignSelf: 'flex-start' }}
+								>
+									Close
+
+								</Button>
+							</Box>
+						</Paper>
+					) : (
 						<Paper
 							elevation={2}
 							sx={{
@@ -223,16 +335,30 @@ const Board: FC = () => {
 									{viewingPost.content}
 								</Typography>
 							</Box>
-							<Button
-								variant="outlined"
-								color="inherit"
-								size="small"
-								onClick={() => setViewingPost(null)}
-								sx={{ mt: 3, alignSelf: 'flex-start' }}
-							>
-								Close
-							</Button>
+							<Box>
+								<Button
+									variant="outlined"
+									color="inherit"
+									size="small"
+									onClick={() => setEditMode(true)}
+									sx={{ mt: 3, alignSelf: 'flex-start' }}
+								>
+									Update
+
+								</Button>
+								<Button
+									variant="outlined"
+									color="inherit"
+									size="small"
+									onClick={() => setViewingPost(null)}
+									sx={{ mt: 3, alignSelf: 'flex-start' }}
+								>
+									Close
+
+								</Button>
+							</Box>
 						</Paper>
+					)
 					) : (
 						<Paper
 							elevation={1}

@@ -38,3 +38,18 @@ functions:
           path: delPost
           method: post
           cors: true
+  searchPost:
+    handler: src/searchPost/handler.searchPost
+    events:
+      - http:
+          path: searchPost
+          method: post
+          cors: true
+  editPost:
+    handler: src/editPost/handler.editPost
+    events:
+      - http:
+          path: editPost
+          method: post
+          cors: true         
+          
